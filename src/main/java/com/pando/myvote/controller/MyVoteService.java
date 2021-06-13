@@ -28,7 +28,7 @@ public class MyVoteService {
         Boolean hasVoted = mapSession.get(sessionValue);
 
         // check if user already has voted
-        if (false && hasVoted != null && hasVoted) {
+        if (hasVoted != null && hasVoted) {
             updateModel(model, "Ya votaste");
             return INDEX;
         } else {
