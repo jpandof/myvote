@@ -4,6 +4,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.context.request.RequestContextHolder;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -14,7 +15,7 @@ import java.util.UUID;
 
 @Controller
 public class MyVoteService {
-    public static final String SESSION = "session";
+    public static final String SESSION = "JSESSIONID";
     public static final String INDEX = "index";
     public static final String TIE = "tie";
     Map<String, Integer> mapVotes = new HashMap<>();
@@ -24,7 +25,6 @@ public class MyVoteService {
     public String vote(@PathVariable String value, Model model, HttpServletRequest request, HttpServletResponse response) {
 
         String sessionValue = getSessionValue(request);
-        addCookie(response, sessionValue);
         Boolean hasVoted = mapSession.get(sessionValue);
 
         // check if user already has voted
@@ -54,30 +54,7 @@ public class MyVoteService {
     }
 
     private String getSessionValue(HttpServletRequest request) {
-        for (Cookie cookie : request.getCookies()) {
-            if (SESSION.equals(cookie.getName())) {
-                return cookie.getValue();
-            }
-        }
-
-        return UUID.randomUUID().toString();
-    }
-
-    private void addCookie(HttpServletResponse response, String sessionValue) {
-        // create a cookie
-
-        Cookie cookie = new Cookie(SESSION, sessionValue);
-
-        // expires in 1 day
-        cookie.setMaxAge(24 * 60 * 60);
-
-        // optional properties
-        cookie.setSecure(true);
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
-
-        // add cookie to response
-        response.addCookie(cookie);
+        return RequestContextHolder.currentRequestAttributes().getSessionId();
     }
 
     @GetMapping("/result")
@@ -85,13 +62,17 @@ public class MyVoteService {
 
         if (mapVotes.isEmpty()) {
             model.addAttribute("message", "Sin resultados");
+            return INDEX;
         }
 
         String winner = null;
         int totalVote = 0;
         for (Map.Entry<String, Integer> entry : mapVotes.entrySet()) {
+            Integer vote = entry.getValue();
             if (winner == null) {
-                Integer vote = entry.getValue();
+                winner = entry.getKey();
+                totalVote = vote;
+            } else {
                 if (totalVote == vote) {
                     winner = TIE;
                 } else if (totalVote < vote) {
@@ -120,9 +101,10 @@ public class MyVoteService {
     }
 
     @GetMapping("/clear")
-    public String clear() {
+    public String clear(Model model) {
         mapSession.clear();
         mapVotes.clear();
+        model.addAttribute("message", "Reset OK");
         return INDEX;
     }
 
