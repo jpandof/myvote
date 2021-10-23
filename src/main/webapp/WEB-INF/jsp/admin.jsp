@@ -7,25 +7,27 @@
     <script src="/jquery-3.6.0.slim.min.js"></script>
 </head>
 <body>
-<c:choose>
-    <c:when test='${message != null}'>
-        <a href="/" >
-            <img src="https://assets.dryicons.com/uploads/icon/svg/2518/refresh.svg" alt="actualizar votación">
-        </a>
-    </c:when>
-    <c:otherwise>
-        <ul class="vote">
-            <li>
-                <a class="yes" href="/vote/YES">YES</a>
-            </li>
-            <li>
-                <a class="no" href="/vote/NO">NO</a>
-            </li>
-        </ul>
-    </c:otherwise>
-</c:choose>
+<ul class="special">
+    <li>
+        <a href="/admin/clear">RESET</a>
+    </li>
+    <li>
+        <form action="/admin/change" method="get">
+            <input type="number" class="participantes" name="totalParticipantes" value="${totalParticipantes}"/>
+            <input type="submit" class="participantes" title="Cambiar"></input>
+        </form>
+    </li>
 
+</ul>
 
+<ul>
+    <li>
+        <a class="admin yes" href="/admin/vote/YES">YES</a>
+    </li>
+    <li>
+        <a class="admin no" href="/admin/vote/NO">NO</a>
+    </li>
+</ul>
 
 <div class="progress" data-label="${totalVotes}/${totalParticipantes}">
     <span class="value"></span>
@@ -35,13 +37,15 @@
 <c:if test="${message != null}">
     <div class="msg">${message}</div>
 </c:if>
+<c:if test="${totalVotes != null}">
+    <div>Total votos: ${totalVotes}</div>
+</c:if>
 <c:if test="${results != null}">
     <div>Resultados
         <div class="results">${results}</div>
     </div>
 </c:if>
 <div class="winner"><p>${winner}</p></div>
-
 
 </body>
 </html>
