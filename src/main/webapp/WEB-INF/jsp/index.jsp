@@ -12,6 +12,9 @@
         <a href="/" >
             <img src="https://assets.dryicons.com/uploads/icon/svg/2518/refresh.svg" alt="actualizar votación">
         </a>
+        <script>
+
+        </script>
     </c:when>
     <c:otherwise>
         <ul class="vote">
